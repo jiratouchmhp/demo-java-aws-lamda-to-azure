@@ -1,0 +1,52 @@
+apiVersion: 2023-05-01
+location: eastasia
+name: springboot-api
+properties:
+  environmentId: /subscriptions/<subscription-id>/resourceGroups/rg-springboot/providers/Microsoft.App/managedEnvironments/aca-env
+  configuration:
+    ingress:
+      external: true
+      targetPort: 8080
+      transport: auto
+      allowInsecure: false
+      traffic:
+        - weight: 100
+          latestRevision: true
+    registries:
+      - server: myacr.azurecr.io
+        identity: system
+    secrets:
+      - name: spring-profile
+        value: "prod"
+  template:
+    containers:
+      - name: springboot-api
+        image: myacr.azurecr.io/springboot-api:1.0.0
+        resources:
+          cpu: 0.5
+          memory: 1Gi
+        env:
+          - name: SPRING_PROFILES_ACTIVE
+            secretRef: spring-profile
+        probes:
+          - type: Liveness
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          - type: Readiness
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+    scale:
+      minReplicas: 1
+      maxReplicas: 5
+      rules:
+        - name: http-scaling
+          http:
+            metadata:
+              concurrentRequests: "100"
+type: Microsoft.App/containerApps

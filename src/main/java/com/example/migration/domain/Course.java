@@ -1,4 +1,4 @@
-package com.javatechie.dto;
+package com.example.migration.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Course {
-
     private int id;
     private String name;
     private double price;
