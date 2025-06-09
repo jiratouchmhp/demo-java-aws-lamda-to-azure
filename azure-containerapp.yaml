@@ -1,0 +1,75 @@
+apiVersion: template
+kind: Template
+metadata:
+  name: springboot-containerapp
+  description: Spring Boot application deployment to Azure Container Apps
+parameters:
+- name: RESOURCE_GROUP
+  displayName: Resource Group
+  description: The resource group for deployment
+  value: rg-springboot
+- name: ACR_NAME  
+  displayName: Azure Container Registry
+  description: The ACR name
+  value: myacr
+- name: IMAGE_TAG
+  displayName: Image Tag
+  description: Docker image tag
+  value: "1.0.0"
+- name: LOCATION
+  displayName: Location
+  description: Azure region
+  value: eastus
+objects:
+- type: Microsoft.App/containerApps
+  apiVersion: 2023-05-01
+  name: springboot-api
+  location: ${LOCATION}
+  properties:
+    environmentId: /subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.App/managedEnvironments/aca-env
+    configuration:
+      ingress:
+        external: true
+        targetPort: 8080
+        transport: auto
+        allowInsecure: false
+        traffic:
+        - weight: 100
+          latestRevision: true
+      registries:
+      - server: ${ACR_NAME}.azurecr.io
+        identity: system
+      secrets:
+      - name: spring-profile
+        value: "prod"
+    template:
+      containers:
+      - name: springboot-api
+        image: ${ACR_NAME}.azurecr.io/springboot-api:${IMAGE_TAG}
+        resources:
+          cpu: 0.5
+          memory: 1Gi
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          secretRef: spring-profile
+        probes:
+        - type: liveness
+          httpGet:
+            path: "/ping"
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        - type: readiness
+          httpGet:
+            path: "/ping"
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      scale:
+        minReplicas: 1
+        maxReplicas: 5
+        rules:
+        - name: http-scaling
+          http:
+            metadata:
+              concurrentRequests: "100"

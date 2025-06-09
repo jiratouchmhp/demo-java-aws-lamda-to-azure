@@ -1,6 +1,10 @@
-com/javatechie/StreamLambdaHandler.class
-com/javatechie/service/CourseService.class
-com/javatechie/controller/PingController.class
-com/javatechie/dto/Course.class
-com/javatechie/controller/CourseController.class
-com/javatechie/Application.class
+com/example/migration/application/CourseService.class
+com/example/migration/MigrationApplication.class
+com/example/migration/controller/PingController.class
+com/example/migration/dto/CourseMapper.class
+com/example/migration/domain/CourseRepository.class
+com/example/migration/controller/GlobalExceptionHandler.class
+com/example/migration/dto/CourseDto.class
+com/example/migration/domain/Course.class
+com/example/migration/adapter/InMemoryCourseRepository.class
+com/example/migration/controller/CourseController.class

@@ -1,82 +1,213 @@
-# spring-boot-lambda serverless API
-The spring-boot-lambda project, created with [`aws-serverless-java-container`](https://github.com/aws/serverless-java-container).
+# Spring Boot Migration API
 
-The starter project defines a simple `/ping` resource that can accept `GET` requests with its tests.
+This project demonstrates the migration from AWS Lambda Java to a containerized Spring Boot application using clean architecture principles, targeting Azure Container Apps.
 
-The project folder also includes a `template.yml` file. You can use this [SAM](https://github.com/awslabs/serverless-application-model) file to deploy the project to AWS Lambda and Amazon API Gateway or test in local with the [SAM CLI](https://github.com/awslabs/aws-sam-cli). 
+## Migration Overview
 
-## Pre-requisites
-* [AWS CLI](https://aws.amazon.com/cli/)
-* [SAM CLI](https://github.com/awslabs/aws-sam-cli)
-* [Gradle](https://gradle.org/) or [Maven](https://maven.apache.org/)
+This application has been successfully migrated from:
+- **From**: AWS Lambda with Spring Boot serverless container
+- **To**: Containerized Spring Boot application with clean architecture
+- **Target**: Azure Container Apps, Azure AKS, Azure App Services
 
-## Building the project
-You can use the SAM CLI to quickly build the project
-```bash
-$ mvn archetype:generate -DartifactId=spring-boot-lambda -DarchetypeGroupId=com.amazonaws.serverless.archetypes -DarchetypeArtifactId=aws-serverless-jersey-archetype -DarchetypeVersion=2.0.2 -DgroupId=org.example -Dversion=1.0-SNAPSHOT -Dinteractive=false
-$ cd spring-boot-lambda
-$ sam build
-Building resource 'SpringBootLambdaFunction'
-Running JavaGradleWorkflow:GradleBuild
-Running JavaGradleWorkflow:CopyArtifacts
+## Architecture
 
-Build Succeeded
+The application follows clean architecture principles with the following layers:
 
-Built Artifacts  : .aws-sam/build
-Built Template   : .aws-sam/build/template.yaml
-
-Commands you can use next
-=========================
-[*] Invoke Function: sam local invoke
-[*] Deploy: sam deploy --guided
+```
+src/main/java/com/example/migration/
+├── MigrationApplication.java    # Main Spring Boot application
+├── domain/                      # Domain layer (business entities & interfaces)
+│   ├── Course.java             # Domain entity
+│   └── CourseRepository.java   # Repository interface (port)
+├── application/                 # Application layer (use cases & business logic)
+│   └── CourseService.java      # Business orchestration
+├── adapter/                     # Infrastructure layer (external concerns)
+│   └── InMemoryCourseRepository.java  # Repository implementation
+├── controller/                  # Presentation layer (REST controllers)
+│   ├── CourseController.java   # CRUD operations for courses
+│   ├── PingController.java     # Health check endpoint
+│   └── GlobalExceptionHandler.java  # Error handling
+└── dto/                        # Data Transfer Objects
+    ├── CourseDto.java         # API request/response DTO
+    └── CourseMapper.java      # Domain ⟷ DTO mapping
 ```
 
-## Testing locally with the SAM CLI
+## Features
 
-From the project root folder - where the `template.yml` file is located - start the API with the SAM CLI.
+- **Health Check**: `GET /ping` - Simple health check endpoint
+- **Course Management**: Full CRUD operations at `/courses`
+  - `GET /courses` - List all courses
+  - `POST /courses` - Create a new course  
+  - `GET /courses/{id}` - Get course by ID
+  - `PUT /courses/{id}` - Update course
+  - `DELETE /courses/{id}` - Delete course
+- **API Documentation**: Swagger UI available at `/swagger-ui.html`
+- **Validation**: Request validation with proper error responses
+- **Error Handling**: Global exception handling with structured responses
+- **Logging**: Structured logging with SLF4J
+- **Environment Profiles**: Development and production configurations
+
+## Technology Stack
+
+- **Java 17**
+- **Spring Boot 3.2.6**
+- **Maven** for build management
+- **Docker** for containerization
+- **OpenAPI/Swagger** for API documentation
+- **JUnit 5** for testing
+- **Azure Container Apps** for deployment
+
+## Getting Started
+
+### Prerequisites
+
+- Java 17 or higher
+- Maven 3.6 or higher
+- Docker (for containerization)
+- Azure CLI (for Azure deployment)
+
+### Running Locally
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd demo-java-aws-lamda-to-azure
+   ```
+
+2. **Build and run the application**
+   ```bash
+   mvn spring-boot:run
+   ```
+
+3. **Test the application**
+   ```bash
+   # Health check
+   curl http://localhost:8080/ping
+   
+   # Create a course
+   curl -X POST http://localhost:8080/courses \
+     -H "Content-Type: application/json" \
+     -d '{"id": 1, "name": "Spring Boot Fundamentals", "price": 99.99}'
+   
+   # Get all courses
+   curl http://localhost:8080/courses
+   ```
+
+4. **View API documentation**
+   Open http://localhost:8080/swagger-ui.html in your browser
+
+### Running Tests
 
 ```bash
-$ sam local start-api
-
-...
-Mounting com.amazonaws.serverless.archetypes.StreamLambdaHandler::handleRequest (java11) at http://127.0.0.1:3000/{proxy+} [OPTIONS GET HEAD POST PUT DELETE PATCH]
-...
+mvn test
 ```
 
-Using a new shell, you can send a test ping request to your API:
+## Containerization
+
+### Build Docker Image
 
 ```bash
-$ curl -s http://127.0.0.1:3000/ping | python -m json.tool
+docker build -t springboot-api:1.0.0 .
+```
+
+### Run Container Locally
+
+```bash
+docker run -p 8080:8080 springboot-api:1.0.0
+```
+
+## Azure Deployment
+
+### Automated Deployment
+
+Use the provided deployment script:
+
+```bash
+chmod +x deploy-azure.sh
+./deploy-azure.sh
+```
+
+### Manual Deployment
+
+1. **Create Azure Container Registry**
+   ```bash
+   az acr create --name myacr --resource-group rg-springboot --sku Basic
+   ```
+
+2. **Build and push image**
+   ```bash
+   az acr build --registry myacr --image springboot-api:1.0.0 --file Dockerfile .
+   ```
+
+3. **Create Container App Environment**
+   ```bash
+   az containerapp env create --name aca-env --resource-group rg-springboot --location eastus
+   ```
+
+4. **Deploy using ARM template**
+   ```bash
+   az deployment group create \
+     --resource-group rg-springboot \
+     --template-file azure-container-app-template.json \
+     --parameters containerAppName=springboot-api environmentName=aca-env acrName=myacr
+   ```
+
+## Configuration
+
+### Application Profiles
+
+- **Development** (`dev`): Debug logging enabled, detailed error responses
+- **Production** (`prod`): Optimized logging, secure error responses
+
+### Environment Variables
+
+- `SPRING_PROFILES_ACTIVE`: Set to `dev` or `prod`
+- `SERVER_PORT`: Server port (default: 8080)
+
+## Migration Benefits
+
+✅ **Scalability**: Horizontal scaling with container orchestration  
+✅ **Portability**: Runs on any container platform (Azure, AWS, GCP, on-premises)  
+✅ **Clean Architecture**: Separation of concerns, testable, maintainable  
+✅ **API Documentation**: Auto-generated OpenAPI/Swagger documentation  
+✅ **Validation**: Robust input validation and error handling  
+✅ **Testing**: Comprehensive unit and integration tests  
+✅ **Monitoring**: Health checks and structured logging  
+✅ **DevOps Ready**: Docker containerization and Azure deployment automation  
+
+## API Examples
+
+### Health Check
+```bash
+GET /ping
+Response: {"pong":"Hello, World!"}
+```
+
+### Create Course
+```bash
+POST /courses
+Content-Type: application/json
 
 {
-    "pong": "Hello, World!"
+  "id": 1,
+  "name": "Spring Boot Fundamentals", 
+  "price": 99.99
 }
-``` 
-
-## Deploying to AWS
-To deploy the application in your AWS account, you can use the SAM CLI's guided deployment process and follow the instructions on the screen
-
-```
-$ sam deploy --guided
 ```
 
-Once the deployment is completed, the SAM CLI will print out the stack's outputs, including the new application URL. You can use `curl` or a web browser to make a call to the URL
-
-```
-...
--------------------------------------------------------------------------------------------------------------
-OutputKey-Description                        OutputValue
--------------------------------------------------------------------------------------------------------------
-SpringBootLambdaApi - URL for application            https://xxxxxxxxxx.execute-api.us-west-2.amazonaws.com/Prod/pets
--------------------------------------------------------------------------------------------------------------
-```
-
-Copy the `OutputValue` into a browser or use curl to test your first request:
-
+### Get All Courses
 ```bash
-$ curl -s https://xxxxxxx.execute-api.us-west-2.amazonaws.com/Prod/ping | python -m json.tool
-
-{
-    "pong": "Hello, World!"
-}
+GET /courses
+Response: [{"id":1,"name":"Spring Boot Fundamentals","price":99.99}]
 ```
+
+## Contributing
+
+1. Follow clean architecture principles
+2. Maintain test coverage
+3. Update documentation for API changes
+4. Use conventional commit messages
+
+## License
+
+This project is part of a migration demonstration from AWS Lambda to Azure Container Apps.

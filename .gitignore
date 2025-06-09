@@ -1,0 +1,36 @@
+# Maven build artifacts
+target/
+*.class
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Gradle build artifacts
+.gradle/
+build/
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Azure deployment files (will be created later)
+*.azurecr.io
