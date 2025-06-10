@@ -1,0 +1,4 @@
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/test/java/com/example/migration/adapter/InMemoryCourseRepositoryTest.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/test/java/com/example/migration/controller/PingControllerTest.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/test/java/com/example/migration/controller/CourseControllerTest.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/test/java/com/example/migration/application/CourseServiceTest.java

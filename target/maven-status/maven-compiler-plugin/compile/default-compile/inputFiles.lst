@@ -1,0 +1,10 @@
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/MigrationApplication.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/application/CourseService.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/dto/PingResponse.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/controller/GlobalExceptionHandler.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/domain/CourseRepository.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/adapter/InMemoryCourseRepository.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/domain/Course.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/controller/CourseController.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/dto/CourseDto.java
+/home/runner/work/demo-java-aws-lamda-to-azure/demo-java-aws-lamda-to-azure/src/main/java/com/example/migration/controller/PingController.java
