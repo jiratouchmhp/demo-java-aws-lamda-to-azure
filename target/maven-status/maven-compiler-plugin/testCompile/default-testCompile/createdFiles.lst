@@ -1,1 +1,4 @@
-com/javatechie/StreamLambdaHandlerTest.class
+com/example/migration/controller/PingControllerTest.class
+com/example/migration/controller/CourseControllerTest.class
+com/example/migration/application/CourseServiceTest.class
+com/example/migration/adapter/InMemoryCourseRepositoryTest.class

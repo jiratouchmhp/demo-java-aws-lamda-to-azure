@@ -1,0 +1,83 @@
+spring:
+  application:
+    name: spring-boot-migration
+  profiles:
+    active: dev
+
+# Default configuration
+server:
+  port: 8080
+
+# OpenAPI Documentation
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# Logging configuration
+logging:
+  level:
+    com.example.migration: INFO
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+---
+# Development profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+server:
+  port: 8080
+
+# Enable all OpenAPI features for development
+springdoc:
+  swagger-ui:
+    enabled: true
+    try-it-out-enabled: true
+
+logging:
+  level:
+    com.example.migration: DEBUG
+    org.springframework.web: DEBUG
+
+---
+# Test profile
+spring:
+  config:
+    activate:
+      on-profile: test
+
+server:
+  port: 0  # Random port for testing
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    com.example.migration: WARN
+
+---
+# Production profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    com.example.migration: INFO
+    root: WARN
